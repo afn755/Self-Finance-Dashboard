@@ -89,4 +89,4 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ### 🙋‍♂️ Author
 
-- **Ifti's Wallet Dash** created and maintained by [@your-username](https://github.com/afn755).
+- **Ifti's Wallet Dash** created and maintained by [@afn755](https://github.com/afn755).
