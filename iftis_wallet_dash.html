@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Self Finance Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #111827;
+      color: #d1d5db;
+    }
+    header {
+      padding: 20px;
+      background-color: #1f2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      font-size: 24px;
+      color: #fb923c;
+    }
+    #main {
+      padding: 20px;
+    }
+    .flex {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .input-group {
+      flex: 1 1 200px;
+      display: flex;
+      flex-direction: column;
+      background: #1f2937;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .input-group label {
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #f9fafb;
+    }
+    .input-group input {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #374151;
+      color: #f9fafb;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px;
+      background: #fb923c;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      margin-top: 10px;
+      cursor: pointer;
+      height: 50px;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #f97316;
+    }
+    canvas {
+      margin-top: 30px;
+      background: #1f2937;
+      border-radius: 20px;
+      padding: 20px;
+    }
+    .summary {
+      margin-top: 20px;
+      font-size: 24px;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      background: #1f2937;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #374151;
+    }
+    th {
+      color: #fb923c;
+      font-weight: 600;
+    }
+    .section-title {
+      font-size: 20px;
+      margin-top: 40px;
+      margin-bottom: 10px;
+      color: #fb923c;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💰 Ifti's Wallet Dash 💰</h1>
+  <button onclick="exportCSV()">Export CSV</button>
+</header>
+
+<main id="main">
+  <div class="flex">
+    <div class="input-group">
+      <label>Monthly Income (Debit)</label>
+      <input type="number" id="income" placeholder="Enter income" />
+    </div>
+    <div class="input-group">
+      <label>Expense Amount</label>
+      <input type="number" id="expense" placeholder="Enter expense" />
+    </div>
+    <div class="input-group">
+      <label>Expense Description</label>
+      <input type="text" id="expenseDescription" placeholder="Enter description" />
+    </div>
+    <div class="input-group">
+      <label>Debt Amount (if any)</label>
+      <input type="number" id="debt" placeholder="Enter debt" />
+    </div>
+    <div class="input-group">
+      <label>Date</label>
+      <input type="date" id="date" />
+    </div>
+  </div>
+  <button onclick="addTransaction()">Add Transaction</button>
+
+  <div class="summary" id="summaryText"></div>
+
+  <canvas id="financeChart"></canvas>
+
+  <div class="section-title">📄 Full Transaction History</div>
+  <table id="transactionTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Expense</th>
+        <th>Description</th>
+        <th>Debt</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+</main>
+
+<script>
+  let transactions = [];
+  let incomeAmount = 0;
+
+  const ctx = document.getElementById('financeChart').getContext('2d');
+  const financeChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Expenses', data: [], borderColor: 'red', fill: false, tension: 0.4 },
+        { label: 'Debts', data: [], borderColor: 'blue', fill: false, tension: 0.4 },
+        { label: 'Income', data: [], borderColor: 'green', fill: false, tension: 0.4 },
+        { label: 'Safe Line', data: [], borderColor: 'yellow', borderDash: [5,5], fill: false, tension: 0.4 }
+      ]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 1000, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { labels: { color: '#f9fafb' } },
+        tooltip: { backgroundColor: '#1f2937' }
+      },
+      scales: {
+        x: { ticks: { color: '#f9fafb' } },
+        y: { ticks: { color: '#f9fafb' }, beginAtZero: true }
+      }
+    }
+  });
+
+  function addTransaction() {
+    const expense = parseFloat(document.getElementById('expense').value) || 0;
+    const debt = parseFloat(document.getElementById('debt').value) || 0;
+    const expenseDescription = document.getElementById('expenseDescription').value || 'No description';
+    const date = document.getElementById('date').value;
+    if (!date) return alert('Please select a date.');
+
+    if (document.getElementById('income').value) {
+      incomeAmount = parseFloat(document.getElementById('income').value);
+      document.getElementById('income').value = '';
+    }
+
+    transactions.push({ date, expense, debt, description: expenseDescription });
+    updateChart();
+    updateTable();
+    updateSummary();
+    clearInputs();
+  }
+
+  function updateChart() {
+    financeChart.data.labels = transactions.map(t => t.date);
+    financeChart.data.datasets[0].data = transactions.map(t => t.expense);
+    financeChart.data.datasets[1].data = transactions.map(t => t.debt);
+    financeChart.data.datasets[2].data = transactions.map(() => incomeAmount);
+    financeChart.data.datasets[3].data = transactions.map(() => incomeAmount * 0.6); // Safe line 60% of income
+    financeChart.update();
+  }
+
+  function updateTable() {
+    const tbody = document.querySelector('#transactionTable tbody');
+    tbody.innerHTML = '';
+    transactions.forEach(t => {
+      const row = `<tr><td>${t.date}</td><td>${t.expense} BDT</td><td>${t.description}</td><td>${t.debt} BDT</td></tr>`;
+      tbody.innerHTML += row;
+    });
+  }
+
+  function updateSummary() {
+    const totalExpense = transactions.reduce((sum, t) => sum + t.expense + t.debt, 0);
+    const savings = incomeAmount - totalExpense;
+    const summary = document.getElementById('summaryText');
+    if (savings >= 0) {
+      summary.innerHTML = `🎉 Savings This Month: <span style="color:lightgreen;">${savings} BDT</span>`;
+    } else {
+      summary.innerHTML = `⚠️ Deficit This Month: <span style="color:red;">${savings} BDT</span>`;
+    }
+  }
+
+  function exportCSV() {
+    let csv = 'Date,Expense,Description,Debt\n';
+    transactions.forEach(t => {
+      csv += `${t.date},${t.expense},${t.description},${t.debt}\n`;
+    });
+    const blob = new Blob([csv], {type: 'text/csv'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'finance_report.csv';
+    link.click();
+  }
+
+  function clearInputs() {
+    document.getElementById('expense').value = '';
+    document.getElementById('debt').value = '';
+    document.getElementById('expenseDescription').value = '';
+    document.getElementById('date').value = '';
+  }
+</script>
+
+</body>
+</html>
