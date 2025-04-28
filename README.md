@@ -1,4 +1,4 @@
-# Self Finance Dashboard 💰
+# Ifti's Self Finance Dashboard 💰
 
 A **simple self-finance management dashboard** that helps you track your income, expenses, and debts. It provides a visual representation of your financial status and allows you to export your transaction history as a CSV file.
 
@@ -14,14 +14,6 @@ A **simple self-finance management dashboard** that helps you track your income,
 
 ---
 
-## 🎥 Demo
-
-You can check out the live demo of the Self Finance Dashboard in action! 
-
-**[View Demo](#)**
-
----
-
 ## 🛠️ Tech Stack
 
 - **HTML5**
@@ -34,12 +26,7 @@ You can check out the live demo of the Self Finance Dashboard in action!
 
 To set up this project locally, follow these steps:
 
-1. **Clone** the repository:
-    ```bash
-    git clone https://github.com/your-username/self-finance-dashboard.git
-    ```
-
-2. **Open** the `index.html` file in your browser.
+1. **Open** the `.html` file in your browser.
 
 ---
 
@@ -54,15 +41,17 @@ To set up this project locally, follow these steps:
 
 ---
 
-## 📸 Screenshot
+## 📸 Demo
 
-![Dashboard Screenshot](./screenshot.png)
+(https://iftiswalletdash.tiiny.site/)
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions to this project! To get started:
+We welcome contributions to this project for further enhancement! 
+
+To get started:
 
 1. **Fork** the repository.
 2. **Clone** your forked repo to your local machine.
@@ -100,4 +89,4 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ### 🙋‍♂️ Author
 
-- **Ifti's Wallet Dash** created and maintained by [@your-username](https://github.com/your-username).
+- **Ifti's Wallet Dash** created and maintained by [@your-username](https://github.com/afn755).
